@@ -1787,6 +1787,9 @@ export async function startNotebookSession(input: {
 				marimoNotebookDefaults,
 				marimoSharingDisabled,
 			];
+			if (MODE_POLICY[mode].injectEditorConfig && deps.policy.editorAutoInstantiate === false) {
+				contributors.push(() => ({ runtime: { auto_instantiate: false } }));
+			}
 			if (MODE_POLICY[mode].injectEditorConfig && userHome) {
 				contributors.push(() => ({
 					file_browser: { folders: [{ path: userHome.path, name: 'Personal files' }] },

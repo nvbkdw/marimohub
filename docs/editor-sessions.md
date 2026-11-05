@@ -83,6 +83,11 @@ button names the compute profile it will start. A notebook that already has a
 running edit session is attached immediately, including one another editor
 starts while the snapshot is showing. Apps and viewers are unaffected.
 
+To make opening fast once a session is running, set
+`MARIMOHUB_EDITOR_AUTO_INSTANTIATE=false`: the editor opens without running any
+cell (marimo's `runtime.auto_instantiate`), so heavy notebooks do not reload data
+or models on every open. Editors run cells when they need them; apps always run.
+
 ## Browse and edit workspace files
 
 **Browse files** on a notebook page opens the workspace mirror that the

@@ -301,6 +301,11 @@ export interface PolicyConfig {
 	/** Whether opening a notebook starts an editor's session (config: MARIMOHUB_EDITOR_SESSION_START). */
 	editorSessionStart?: EditorSessionStart;
 	/**
+	 * Whether editor sessions run the notebook on open (marimo
+	 * `runtime.auto_instantiate`; config: MARIMOHUB_EDITOR_AUTO_INSTANTIATE). Default true.
+	 */
+	editorAutoInstantiate?: boolean;
+	/**
 	 * Deployment-wide fallback role (config: MARIMOHUB_DEFAULT_ROLE) granted to any
 	 * authenticated user who is neither the project owner nor an explicit member.
 	 * `editor` lets every logged-in user edit notebooks; undefined keeps writes
