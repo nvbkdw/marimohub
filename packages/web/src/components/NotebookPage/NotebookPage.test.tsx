@@ -705,6 +705,57 @@ describe('NotebookPage viewer modes', () => {
 		expect(await screen.findByText('large — 8 CPU · 32 Gi')).toBeInTheDocument();
 	});
 
+	it('editor + on-demand: shows the snapshot and starts no session until asked', async () => {
+		const user = userEvent.setup();
+		const impl = makeFetch({
+			role: 'editor',
+			editorSessionStart: 'on-demand',
+			html: '<html><body>outputs</body></html>',
+		});
+		const { container } = renderPage();
+
+		expect(await screen.findByText(/Static snapshot of outputs/)).toBeVisible();
+		expect(screen.getByText(/no session is running/)).toBeVisible();
+		expect(container.querySelector('iframe')!.getAttribute('sandbox')).toBe('allow-scripts');
+		expect(sessionPosts(impl)).toHaveLength(0);
+
+		await user.click(screen.getByRole('button', { name: 'Start session' }));
+		await waitFor(() => expect(sessionPosts(impl)).toHaveLength(1));
+		expect(screen.queryByText(/no session is running/)).toBeNull();
+	});
+
+	it('editor + on-demand without a snapshot: names the profile it will start', async () => {
+		const impl = makeFetch({
+			role: 'editor',
+			editorSessionStart: 'on-demand',
+			html: null,
+			computeProfile: 'large',
+			computeProfileOverride: 'editors',
+			computeProfiles: [
+				{ name: 'small', cpu: 1 },
+				{ name: 'large', cpu: 8 },
+			],
+		});
+		renderPage();
+
+		expect(await screen.findByText('No outputs yet')).toBeVisible();
+		expect(screen.getByRole('button', { name: 'Start session (large)' })).toBeVisible();
+		expect(sessionPosts(impl)).toHaveLength(0);
+	});
+
+	it('editor + on-demand: attaches at once when an edit session is already live', async () => {
+		const impl = makeFetch({
+			role: 'editor',
+			editorSessionStart: 'on-demand',
+			html: '<html><body>outputs</body></html>',
+			projectSessions: [runningSession()],
+		});
+		renderPage();
+
+		await waitFor(() => expect(sessionPosts(impl)).toHaveLength(1));
+		expect(screen.queryByRole('button', { name: 'Start session' })).toBeNull();
+	});
+
 	it('viewer + static: renders the snapshot sandboxed, never starts a session', async () => {
 		const impl = makeFetch({ role: 'viewer', html: '<html><body>outputs</body></html>' });
 		const { container } = renderPage();

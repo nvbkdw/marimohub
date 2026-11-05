@@ -18,6 +18,7 @@ import type {
 	ComputeResources,
 	createServices,
 	EditorSandboxSharing,
+	EditorSessionStart,
 	FederationTarget,
 	ProjectIntegrationsService,
 	KernelProbe,
@@ -297,6 +298,8 @@ export const DEFAULT_CHAT_CONFIG: ChatConfig = {
 export interface PolicyConfig {
 	/** How persistent edit sandboxes are shared between editors. */
 	editorSandboxSharing?: EditorSandboxSharing;
+	/** Whether opening a notebook starts an editor's session (config: MARIMOHUB_EDITOR_SESSION_START). */
+	editorSessionStart?: EditorSessionStart;
 	/**
 	 * Deployment-wide fallback role (config: MARIMOHUB_DEFAULT_ROLE) granted to any
 	 * authenticated user who is neither the project owner nor an explicit member.

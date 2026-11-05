@@ -40,6 +40,7 @@ import {
 	ProxyExposure,
 	ASSIGNABLE_ROLES,
 	EDITOR_SANDBOX_SHARING_VALUES,
+	EDITOR_SESSION_START_VALUES,
 	runPreflight,
 	DataPreviewService,
 	DataQueryService,
@@ -59,6 +60,7 @@ import type {
 import { createPostgresDataQueryExecutorFactory } from '@marimo-hub/postgres-runtime/node';
 import type {
 	EditorSandboxSharing,
+	EditorSessionStart,
 	Metrics,
 	AssignableRole,
 	SandboxExposure,
@@ -540,6 +542,10 @@ function parseViewerMode(env: Env): ViewerMode {
 	return parseEnumOr(env, 'MARIMOHUB_VIEWER_MODE', VIEWER_MODES, 'static');
 }
 
+function parseEditorSessionStart(env: Env): EditorSessionStart {
+	return parseEnumOr(env, 'MARIMOHUB_EDITOR_SESSION_START', EDITOR_SESSION_START_VALUES, 'on-open');
+}
+
 function parseEditorSandboxSharing(env: Env): EditorSandboxSharing {
 	return parseEnumOr(
 		env,
@@ -836,6 +842,7 @@ export function createFromEnv(
 			defaultRole: parseDefaultRole(env),
 			viewerMode: parseViewerMode(env),
 			editorSandboxSharing,
+			editorSessionStart: parseEditorSessionStart(env),
 			allowedOrigins: parseList(env.MARIMOHUB_ALLOWED_ORIGINS),
 			superAdmins: parseList(env.MARIMOHUB_SUPER_ADMINS),
 			...(projectCreationRestricted(env) ? { projectCreationRestricted: true } : {}),

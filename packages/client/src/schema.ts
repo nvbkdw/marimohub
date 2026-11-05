@@ -2821,6 +2821,8 @@ export interface components {
 			};
 			/** @enum {string} */
 			editor_sandbox_sharing: 'shared' | 'exclusive';
+			/** @enum {string} */
+			editor_session_start: 'on-open' | 'on-demand';
 			/** @enum {string|null} */
 			default_role: 'manager' | 'editor' | 'viewer' | 'app-user' | null;
 			limits: {

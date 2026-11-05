@@ -1325,6 +1325,17 @@ describe('createFromEnv default role', () => {
 		).toThrow(/Invalid MARIMOHUB_EDITOR_SANDBOX_SHARING.*shared, exclusive/);
 	});
 
+	it('defaults editor session start to on-open and accepts on-demand', () => {
+		expect(createFromEnv({ ...baseEnv }).policy.editorSessionStart).toBe('on-open');
+		expect(
+			createFromEnv({ ...baseEnv, MARIMOHUB_EDITOR_SESSION_START: 'on-demand' }).policy
+				.editorSessionStart,
+		).toBe('on-demand');
+		expect(() => createFromEnv({ ...baseEnv, MARIMOHUB_EDITOR_SESSION_START: 'lazy' })).toThrow(
+			/Invalid MARIMOHUB_EDITOR_SESSION_START.*on-open, on-demand/,
+		);
+	});
+
 	it('rejects the CoreWeave vars Sandbox v1 cannot honor', () => {
 		// Set on any backend for the user-home var (its successor is runner-based)…
 		expect(() =>

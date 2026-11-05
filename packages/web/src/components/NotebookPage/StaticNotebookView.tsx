@@ -1,4 +1,5 @@
 import { Camera, Play } from 'lucide-react';
+import { Button } from '@/components/ui';
 import { useLocation } from 'react-router-dom';
 import { LinkButton } from '@/components/ui/Button';
 import { notebookAppUrl } from '@/lib/notebookUrls';
@@ -11,8 +12,16 @@ interface StaticNotebookViewProps {
 	notebookId: string;
 	title: string;
 	canRunApp?: boolean;
-	/** Banner copy: the role-gated viewer fallback vs the standalone SnapshotPage. */
-	variant?: 'viewer' | 'standalone';
+	/**
+	 * Banner copy: the role-gated viewer fallback, the standalone SnapshotPage, or
+	 * an editor's notebook page before its session starts
+	 * (MARIMOHUB_EDITOR_SESSION_START=on-demand).
+	 */
+	variant?: 'viewer' | 'standalone' | 'deferred';
+	/** `deferred` only: starts the editor's session. */
+	onStart?: () => void;
+	/** `deferred` only: the start button's label (e.g. naming the compute profile). */
+	startLabel?: string;
 	/** Pin to one version's snapshot instead of the newest available. */
 	versionId?: string;
 	/** The notebook's current head; when the snapshot trails it, the banner says so. */
@@ -36,6 +45,8 @@ export function StaticNotebookView({
 	variant = 'viewer',
 	versionId,
 	headVersionId,
+	onStart,
+	startLabel = 'Start session',
 }: StaticNotebookViewProps) {
 	const location = useLocation();
 	const { data, isPending, isError } = useNotebookHtmlQuery(projectId, notebookId, versionId);
@@ -46,18 +57,23 @@ export function StaticNotebookView({
 	const viewerMessage = canOpenApp
 		? 'run as an app to interact with this notebook.'
 		: 'sessions are disabled for viewers.';
+	const deferred = variant === 'deferred';
 	const snapshotMessage =
 		variant === 'viewer'
 			? viewerMessage
 			: stale
 				? 'the notebook has changed since these outputs were captured.'
-				: 'captured when the last editing session ended.';
+				: deferred
+					? 'no session is running.'
+					: 'captured when the last editing session ended.';
 	const banner =
 		data && !isError
 			? `Static snapshot of outputs${capturedFrom} — ${snapshotMessage}`
 			: variant === 'viewer'
 				? `You're a viewer on this project — ${viewerMessage}`
-				: null;
+				: deferred
+					? 'No session is running.'
+					: null;
 
 	return (
 		<>
@@ -75,6 +91,12 @@ export function StaticNotebookView({
 							<Play className="size-3.5" />
 							Run as app
 						</LinkButton>
+					)}
+					{deferred && onStart && (
+						<Button variant="primary" size="sm" className="ml-auto" onPress={onStart}>
+							<Play className="size-3.5" />
+							{startLabel}
+						</Button>
 					)}
 				</div>
 			)}
@@ -111,7 +133,9 @@ export function StaticNotebookView({
 							? 'This version captured no outputs, or they have since been cleaned up.'
 							: canOpenApp
 								? 'Run this notebook as an app to view its live outputs.'
-								: 'An editor needs to run this notebook before its outputs can be viewed.'}
+								: deferred
+									? 'Start a session to open the editor and run this notebook.'
+									: 'An editor needs to run this notebook before its outputs can be viewed.'}
 					</p>
 				</div>
 			)}

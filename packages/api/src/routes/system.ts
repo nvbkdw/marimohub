@@ -190,6 +190,7 @@ app.openapi(capabilitiesRoute, (c) => {
 				) / 1000,
 		},
 		editor_sandbox_sharing: deps.policy.editorSandboxSharing ?? 'shared',
+		editor_session_start: deps.policy.editorSessionStart ?? 'on-open',
 		default_role: subjectDefaultRole(c.get('user'), deps.policy),
 		project_groups: { available: deps.policy.groupsCarried ?? false },
 		limits: {
