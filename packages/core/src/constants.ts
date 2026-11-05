@@ -41,6 +41,12 @@ export type SessionMode = (typeof SESSION_MODES)[number];
 /** Whether project editors share one persistent sandbox or use exclusive ownership. */
 export const EDITOR_SANDBOX_SHARING_VALUES = ['shared', 'exclusive'] as const;
 export type EditorSandboxSharing = (typeof EDITOR_SANDBOX_SHARING_VALUES)[number];
+/**
+ * When opening a notebook starts an editor's session: immediately (`on-open`), or
+ * only when the editor asks (`on-demand`), showing the last snapshot until then.
+ */
+export const EDITOR_SESSION_START_VALUES = ['on-open', 'on-demand'] as const;
+export type EditorSessionStart = (typeof EDITOR_SESSION_START_VALUES)[number];
 
 /** Where a notebook's source lives. `git` = a repository synced from an external host. */
 export const SOURCE_TYPES = ['local', 'git'] as const;

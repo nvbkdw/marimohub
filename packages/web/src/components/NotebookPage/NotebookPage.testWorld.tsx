@@ -45,6 +45,8 @@ interface FetchOptions {
 	canRun?: boolean;
 	appOnly?: boolean;
 	viewerMode?: 'static' | 'applications' | 'ephemeral-sandbox';
+	/** MARIMOHUB_EDITOR_SESSION_START as served by /capabilities (default `on-open`). */
+	editorSessionStart?: 'on-open' | 'on-demand';
 	/** Body of GET .../html; null = 404 (no snapshot captured yet). */
 	html?: string | null;
 	session?: Session;
@@ -306,6 +308,7 @@ export function makeFetch(opts: FetchOptions) {
 				app_compute_profiles: opts.appComputeProfiles,
 				compute_profile_override: opts.computeProfileOverride ?? 'none',
 				editor_sandbox_sharing: opts.editorSharing ?? 'shared',
+				editor_session_start: opts.editorSessionStart ?? 'on-open',
 				surfaces: [
 					...(opts.vscode
 						? [

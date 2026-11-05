@@ -235,6 +235,20 @@ describe('GET /api/v1/capabilities', () => {
 		).toMatchObject({ editor_sandbox_sharing: 'exclusive' });
 	});
 
+	it('reports the editor session start, defaulting to on-open', async () => {
+		const defaulted = makeTestDeps(new MemoryBucket(), { authenticator: authed });
+		expect(
+			await expectOk(await createApi(defaulted).request('/api/v1/capabilities')),
+		).toMatchObject({ editor_session_start: 'on-open' });
+		const onDemand = makeTestDeps(new MemoryBucket(), {
+			authenticator: authed,
+			policy: { editorSessionStart: 'on-demand' },
+		});
+		expect(await expectOk(await createApi(onDemand).request('/api/v1/capabilities'))).toMatchObject(
+			{ editor_session_start: 'on-demand' },
+		);
+	});
+
 	it('reports deployment limits', async () => {
 		const deps = makeTestDeps(new MemoryBucket(), {
 			authenticator: authed,

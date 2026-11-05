@@ -73,6 +73,16 @@ temporary editor sandboxes then expose the authenticated user's directory at
 workspace lifecycle. Apps and viewer sandboxes are never created from that
 template.
 
+## Opening without starting a session
+
+By default, opening a notebook starts (or attaches to) an editor session. Set
+`MARIMOHUB_EDITOR_SESSION_START=on-demand` when sessions are slow or costly to
+start, such as on GPU machines provisioned per session. Editors then see the
+notebook's last captured outputs and select **Start session** to run it; the
+button names the compute profile it will start. A notebook that already has a
+running edit session is attached immediately, including one another editor
+starts while the snapshot is showing. Apps and viewers are unaffected.
+
 ## Browse and edit workspace files
 
 **Browse files** on a notebook page opens the workspace mirror that the

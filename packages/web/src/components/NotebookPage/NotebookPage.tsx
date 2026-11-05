@@ -165,6 +165,23 @@ function useNotebookPageModel({ variant = 'edit', target }: NotebookPageProps) {
 	const editorStateFailed = needsEditorState && editorStateQuery.isError;
 	const identityStateFailed =
 		needsEditorState && editorStateQuery.isSuccess && !!editorState?.holder && userQuery.isError;
+	// Deferred start (MARIMOHUB_EDITOR_SESSION_START=on-demand): an editor opening
+	// a notebook sees its last snapshot until they start a session. A live edit
+	// session is attached right away — that costs nothing — including one a
+	// teammate starts while this page shows the snapshot (the list polls).
+	const startOnDemand = !isApp && !isViewer && capabilities?.editor_session_start === 'on-demand';
+	const [startRequested, setStartRequested] = useState(false);
+	const deferredSessions = useProjectSessionsQuery(pid!, startOnDemand && !startRequested);
+	const liveEditSession = useMemo(
+		() => sessionsByNotebook(deferredSessions.data).get(nid!)?.edit,
+		[deferredSessions.data, nid],
+	);
+	const editSessionLive =
+		liveEditSession?.status === 'running' || liveEditSession?.status === 'starting';
+	const startDecisionReady =
+		!startOnDemand || startRequested || deferredSessions.isSuccess || deferredSessions.isError;
+	const deferredStart = startOnDemand && !startRequested && !editSessionLive;
+	const deferredView = startDecisionReady && deferredStart;
 	const takeover = useTakeoverEditorSession(pid!, nid!);
 	const surfaceActions = useSurfaceActions(pid!, nid!);
 
@@ -187,6 +204,8 @@ function useNotebookPageModel({ variant = 'edit', target }: NotebookPageProps) {
 		enabled:
 			(isApp || !isViewer || viewerHasEditKernel) &&
 			editorDecisionReady &&
+			startDecisionReady &&
+			!deferredStart &&
 			(!showEditorChoice || editIntent === 'temporary'),
 		mode: isApp ? 'app' : 'edit',
 		editIntent,
@@ -487,6 +506,9 @@ function useNotebookPageModel({ variant = 'edit', target }: NotebookPageProps) {
 		start,
 		startWithDefault,
 		staticView,
+		deferredView,
+		startDecisionReady,
+		requestStart: () => setStartRequested(true),
 		stopApplicationTab,
 		surfaceActions,
 		takeOver,
@@ -572,6 +594,9 @@ function renderNotebookPage(model: ReturnType<typeof useNotebookPageModel>) {
 		start,
 		startWithDefault,
 		staticView,
+		deferredView,
+		startDecisionReady,
+		requestStart,
 		stopApplicationTab,
 		surfaceActions,
 		takeOver,
@@ -695,7 +720,23 @@ function renderNotebookPage(model: ReturnType<typeof useNotebookPageModel>) {
 				/>
 			)}
 
-			{showEditorChoice && editorState?.holder && (
+			{deferredView && !session && (
+				<StaticNotebookView
+					projectId={pid!}
+					notebookId={nid!}
+					title={title}
+					variant="deferred"
+					headVersionId={notebook?.source.current_version_id ?? undefined}
+					onStart={requestStart}
+					startLabel={
+						computeProfiles.length > 1 && selectedComputeProfile
+							? `Start session (${selectedComputeProfile.name})`
+							: 'Start session'
+					}
+				/>
+			)}
+
+			{showEditorChoice && !deferredView && editorState?.holder && (
 				<div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
 					<AlertTriangle className="size-8 text-amber-600" />
 					<div className="flex max-w-lg flex-col gap-1">
@@ -767,7 +808,9 @@ function renderNotebookPage(model: ReturnType<typeof useNotebookPageModel>) {
 			)}
 
 			{(isProvisioning ||
-				(!session && (resolvingMode || (!isApp && !isViewer && !editorDecisionReady)))) &&
+				(!session &&
+					(resolvingMode ||
+						(!isApp && !isViewer && (!editorDecisionReady || !startDecisionReady))))) &&
 				!showEditorStateFailure &&
 				!showIdentityStateFailure &&
 				!showEditorChoice && (
@@ -779,7 +822,11 @@ function renderNotebookPage(model: ReturnType<typeof useNotebookPageModel>) {
 							)}
 						/>
 						<p>
-							{resolvingMode ? 'Loading...' : isApp ? 'Starting app...' : 'Starting sandbox...'}
+							{resolvingMode || !startDecisionReady
+								? 'Loading...'
+								: isApp
+									? 'Starting app...'
+									: 'Starting sandbox...'}
 						</p>
 					</div>
 				)}

@@ -434,6 +434,11 @@ components:
           enum:
             - shared
             - exclusive
+        editor_session_start:
+          type: string
+          enum:
+            - on-open
+            - on-demand
         default_role:
           type:
             - string
@@ -575,6 +580,7 @@ components:
         - viewer_mode
         - viewer_session_modes
         - editor_sandbox_sharing
+        - editor_session_start
         - default_role
         - limits
         - sandbox_images

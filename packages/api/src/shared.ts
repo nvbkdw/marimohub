@@ -37,6 +37,7 @@ import {
 	SessionRetirer,
 	SOURCE_TYPES,
 	EDITOR_SANDBOX_SHARING_VALUES,
+	EDITOR_SESSION_START_VALUES,
 	VIEWER_MODES,
 	SurfaceForbiddenError,
 } from '@marimo-hub/core';
@@ -1673,6 +1674,12 @@ export const CapabilitiesResponseSchema = z
 		viewer_session_modes: z.array(z.enum(SESSION_MODES)),
 		app_pool: z.object({ heartbeat_interval_seconds: z.number().positive() }).optional(),
 		editor_sandbox_sharing: z.enum(EDITOR_SANDBOX_SHARING_VALUES),
+		/**
+		 * When opening a notebook starts an editor's session
+		 * (MARIMOHUB_EDITOR_SESSION_START): `on-demand` clients show the last
+		 * snapshot until the editor starts one.
+		 */
+		editor_session_start: z.enum(EDITOR_SESSION_START_VALUES),
 		/**
 		 * Role granted to an authenticated non-member (MARIMOHUB_DEFAULT_ROLE);
 		 * null = members-only. The UI derives its role/access copy from this.

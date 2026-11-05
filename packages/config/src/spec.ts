@@ -1830,6 +1830,14 @@ export const CONFIG_SPEC: ConfigGroup[] = [
 						default: 'shared',
 					},
 					{
+						id: 'MARIMOHUB_EDITOR_SESSION_START',
+						name: 'Editor session start',
+						description:
+							"When opening a notebook starts an editor's session. `on-open` starts (or attaches to) a session immediately. `on-demand` shows the last captured outputs and starts a session only when the editor selects **Start session**; an already running edit session is still attached immediately. Use `on-demand` when sessions are slow or costly to start, such as on GPU machines provisioned per session. This setting does not affect apps or viewers. See [Editor sessions](./editor-sessions.md).",
+						example: 'on-demand',
+						default: 'on-open',
+					},
+					{
 						id: 'MARIMOHUB_WORKSPACE_MAX_FILE_BYTES',
 						name: 'Workspace per-file limit',
 						description:

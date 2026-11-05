@@ -51,6 +51,7 @@ const BASE_CAPABILITIES: Capabilities = {
 	viewer_mode: 'static',
 	viewer_session_modes: [],
 	editor_sandbox_sharing: 'shared',
+	editor_session_start: 'on-open',
 	default_role: null,
 	limits: {
 		max_concurrent_sessions_per_user: null,
