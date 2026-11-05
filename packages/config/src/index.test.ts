@@ -1336,6 +1336,14 @@ describe('createFromEnv default role', () => {
 		);
 	});
 
+	it('defaults editor auto-instantiate to true and accepts false', () => {
+		expect(createFromEnv({ ...baseEnv }).policy.editorAutoInstantiate).toBe(true);
+		expect(
+			createFromEnv({ ...baseEnv, MARIMOHUB_EDITOR_AUTO_INSTANTIATE: 'false' }).policy
+				.editorAutoInstantiate,
+		).toBe(false);
+	});
+
 	it('rejects the CoreWeave vars Sandbox v1 cannot honor', () => {
 		// Set on any backend for the user-home var (its successor is runner-based)…
 		expect(() =>

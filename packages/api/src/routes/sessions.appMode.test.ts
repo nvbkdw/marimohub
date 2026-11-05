@@ -289,6 +289,36 @@ describe('Session routes (app mode)', () => {
 		expect(fake.calls.startProcess[0].cmd).not.toContain('--convert');
 	});
 
+	it('turns off auto-instantiate only for edit sessions when configured', async () => {
+		const deps = { policy: { editorAutoInstantiate: false } };
+		const editFake = makeFakeSandbox();
+		const editApi = createTestApi({
+			bucket,
+			userId: ACTOR,
+			compute: fakeComputeFrom(editFake.instance),
+			deps,
+		});
+		await expectOk<any>(await editApi.request('POST', sessionsPath()));
+		const editConfig = editFake.calls.writeFiles
+			.flat()
+			.find((file) => file.path === '/tmp/marimohub-config/marimo/marimo.toml');
+		expect(editConfig?.content).toContain('auto_instantiate = false');
+		expect(editConfig?.content).toContain('default_sql_output = "native"');
+
+		const runFake = makeFakeSandbox();
+		const runApi = createTestApi({
+			bucket,
+			userId: ACTOR,
+			compute: fakeComputeFrom(runFake.instance),
+			deps,
+		});
+		await expectOk<any>(await runApi.request('POST', sessionsPath(), { mode: 'app' }));
+		const runConfig = runFake.calls.writeFiles
+			.flat()
+			.find((file) => file.path.endsWith('/marimo/marimo.toml'));
+		expect(runConfig?.content).not.toContain('auto_instantiate');
+	});
+
 	it.each([
 		{
 			name: 'an allowlist',

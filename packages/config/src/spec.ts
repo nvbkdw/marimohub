@@ -1838,6 +1838,14 @@ export const CONFIG_SPEC: ConfigGroup[] = [
 						default: 'on-open',
 					},
 					{
+						id: 'MARIMOHUB_EDITOR_AUTO_INSTANTIATE',
+						name: 'Editor auto-run on open',
+						description:
+							'Whether an editor session runs the notebook when it opens (marimo `runtime.auto_instantiate`). `false` opens the editor without executing any cell, so it is interactive at once and heavy notebooks do not reload data or models on every open; editors run cells when they need them. A notebook can still override this in its `pyproject.toml` (`[tool.marimo.runtime]`). Apps always run. See [Editor sessions](./editor-sessions.md).',
+						example: 'false',
+						default: 'true',
+					},
+					{
 						id: 'MARIMOHUB_WORKSPACE_MAX_FILE_BYTES',
 						name: 'Workspace per-file limit',
 						description:

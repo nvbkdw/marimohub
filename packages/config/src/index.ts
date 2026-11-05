@@ -843,6 +843,7 @@ export function createFromEnv(
 			viewerMode: parseViewerMode(env),
 			editorSandboxSharing,
 			editorSessionStart: parseEditorSessionStart(env),
+			editorAutoInstantiate: parseBool(env, 'MARIMOHUB_EDITOR_AUTO_INSTANTIATE', true),
 			allowedOrigins: parseList(env.MARIMOHUB_ALLOWED_ORIGINS),
 			superAdmins: parseList(env.MARIMOHUB_SUPER_ADMINS),
 			...(projectCreationRestricted(env) ? { projectCreationRestricted: true } : {}),
